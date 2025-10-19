@@ -1,0 +1,43 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Average annual rainfall (mm) by Australian state/territory",
+  "width": 700,
+  "height": 520,
+  "projection": {"type": "equalEarth"},
+  "data": {
+    "url": "https://raw.githubusercontent.com/rowanhogan/australian-states/master/states.geojson",
+    "format": { "type": "json", "property": "features" }
+  },
+  "transform": [
+    {
+      "lookup": "properties.STATE_NAME",
+      "from": {
+        "data": {
+          "url": "Rain_Data_Sets/Clean_Rainfall_By_State.csv?v=3",
+          "format": { "type": "csv" }
+        },
+        "key": "state",
+        "fields": ["rain_mm"]
+      }
+    }
+  ],
+  "layer": [
+    { "mark": {"type": "geoshape", "fill": "#eeeeee", "stroke": "#999", "strokeWidth": 0.6} },
+    {
+      "mark": {"type": "geoshape", "stroke": "#ffffff", "strokeWidth": 0.6},
+      "encoding": {
+        "color": {
+          "field": "rain_mm",
+          "type": "quantitative",
+          "title": "Average annual rainfall (mm)",
+          "scale": {"scheme": "blues"}
+        },
+        "tooltip": [
+          {"field": "properties.STATE_NAME", "type": "nominal", "title": "State/Territory"},
+          {"field": "rain_mm", "type": "quantitative", "title": "Rainfall (mm/yr)", "format": ".1f"}
+        ]
+      }
+    }
+  ],
+  "config": { "view": {"stroke": null}, "legend": {"orient": "bottom"}, "background": "white" }
+}
