@@ -1,0 +1,59 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Mean annual maximum temperature by city (5-year rolling average), 1940 onwards. Clean styling like the stock example.",
+  "width": 1000,
+  "height": 420,
+
+  "data": { "url": "Temp_Data/Mean_Max_Temp_By_City.csv" },
+
+  "transform": [
+    { "calculate": "toNumber(datum.year)", "as": "year_num" },
+    { "filter": "datum.year_num >= 1940" },
+    {
+      "window": [{ "op": "mean", "field": "temp_c", "as": "temp_roll5" }],
+      "frame": [-2, 2],
+      "groupby": ["city"],
+      "sort": [{ "field": "year_num" }]
+    }
+  ],
+
+  "mark": { "type": "line", "interpolate": "monotone", "strokeWidth": 2.5 },
+
+  "encoding": {
+    "x": {
+      "field": "year_num",
+      "type": "quantitative",
+      "title": "Year",
+      "axis": { "format": "d", "tickCount": 9, "grid": false }
+    },
+    "y": {
+      "field": "temp_roll5",
+      "type": "quantitative",
+      "title": "Mean max temperature (°C)",
+      "axis": { "grid": false }
+    },
+    "color": {
+      "field": "city",
+      "type": "nominal",
+      "title": "City",
+      "scale": { "scheme": "tableau10" }
+    },
+    "tooltip": [
+      { "field": "city", "title": "City" },
+      { "field": "year_num", "title": "Year", "format": "d" },
+      { "field": "temp_roll5", "title": "5-yr avg (°C)", "format": ".1f" }
+    ]
+  },
+
+  "config": {
+    "legend": { "orient": "bottom" },
+    "axis": {
+      "domainColor": "#bbb",
+      "tickColor": "#bbb",
+      "labelColor": "#333",
+      "titleColor": "#333"
+    },
+    "view": { "stroke": null },
+    "background": "white"
+  }
+}

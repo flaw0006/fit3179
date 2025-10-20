@@ -3,24 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Average Rainfall in Australia</title>
+  <title>Australian Rainfall & Temperature Trends</title>
+
   <script src="https://cdn.jsdelivr.net/npm/vega@5.30.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.20.1"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.25.0"></script>
+
   <style>
-    body { font-family: Arial, sans-serif; margin: 40px; background: #f9f9f9; color: #333; text-align: center; }
-    #map { margin: 0 auto; max-width: 900px; }
+    body { font-family: Arial, sans-serif; margin: 40px; background: #f9f9f9; color: #333; }
+    h1, h2, p { text-align: center; }
+    .vis { margin: 24px auto; max-width: 1000px; }
+    #map, #temps { min-height: 200px; }
   </style>
 </head>
 <body>
   <h1>Average Annual Rainfall across Australia</h1>
   <p>Visualising long-term mean annual rainfall (mm) by state and territory.</p>
-  <div id="map"></div>
+  <div id="map" class="vis"></div>
+
+  <h2>Annual Temperature Trends</h2>
+  <p>Mean annual maximum temperature by city with a 5-year rolling average. Hover to highlight a city.</p>
+  <div id="temps" class="vis"></div>
 
   <script>
-    vegaEmbed('#map', 'au_rainfall_map.vl.json?v=2', {actions: false})
-      .then(() => console.log('Map successfully rendered'))
-      .catch(err => console.error('Error rendering map:', err));
+    vegaEmbed('#map', 'au_rainfall_map.vl.json?v=3', { actions: false })
+      .catch(err => console.error('Map error:', err));
+
+    vegaEmbed('#temps', 'temp_trends.vl.json?v=2', { actions: false })
+      .catch(err => console.error('Temps error:', err));
   </script>
 </body>
 </html>
