@@ -1,0 +1,95 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Extreme weather events per year with a multi-select filter and spike annotations.",
+  "width": 1000,
+  "height": 420,
+
+  "data": { "url": "Extreme_Event_Data/Extreme_Weather_Events_By_Year.csv" },
+
+  "params": [
+    {
+      "name": "typePick",
+      "value": [],
+      "bind": {
+        "input": "select",
+        "multiple": true,
+        "size": 6,
+        "options": [
+          "Bushfire",
+          "Cyclone",
+          "Earthquake",
+          "Environment/Heatwave",
+          "Flood",
+          "Landslide",
+          "Storm",
+          "Tsunami"
+        ]
+      }
+    }
+  ],
+
+  "transform": [
+    {
+      "filter": "length(typePick)==0 || indexof(typePick, datum.event_type) >= 0"
+    }
+  ],
+
+  "layer": [
+    {
+      "mark": {"type": "bar"},
+      "encoding": {
+        "x": {
+          "field": "year",
+          "type": "quantitative",
+          "title": "Year",
+          "axis": {"format": "d", "tickCount": 12}
+        },
+        "y": {
+          "aggregate": "sum",
+          "field": "count",
+          "type": "quantitative",
+          "title": "Number of events"
+        },
+        "color": {
+          "field": "event_type",
+          "type": "nominal",
+          "title": "Event type",
+          "scale": {"scheme": "tableau10"}
+        },
+        "tooltip": [
+          {"field": "year", "title": "Year", "format": "d"},
+          {"field": "event_type", "title": "Type"},
+          {"aggregate": "sum", "field": "count", "title": "Events"}
+        ]
+      }
+    },
+
+    {
+      "transform": [
+        {"aggregate": [{"op": "sum", "field": "count", "as": "total"}], "groupby": ["year"]},
+        {"window": [{"op": "rank", "as": "rk"}], "sort": [{"field": "total", "order": "descending"}]},
+        {"filter": "datum.rk <= 5"}
+      ],
+      "mark": {"type": "text", "dy": -6, "fontWeight": "bold"},
+      "encoding": {
+        "x": {"field": "year", "type": "quantitative"},
+        "y": {"field": "total", "type": "quantitative"},
+        "text": {"field": "year"},
+        "color": {"value": "#444"}
+      }
+    }
+  ],
+
+  "config": {
+    "legend": {"orient": "bottom"},
+    "axis": {
+      "grid": false,
+      "domainColor": "#bbb",
+      "tickColor": "#bbb",
+      "labelColor": "#333",
+      "titleColor": "#333"
+    },
+    "view": {"stroke": null},
+    "background": "white"
+  }
+}

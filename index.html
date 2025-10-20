@@ -29,6 +29,10 @@
   <p>Distribution of daily minimum and maximum temperatures across Australian states.</p>
   <div id="boxplot" class="vis"></div>
 
+  <h2>Extreme Weather Events per Year</h2>
+  <p>Click legend to filter one or more event types. Notable spike years are labeled.</p>
+  <div id="events" class="vis"></div>
+
   <script>
     vegaEmbed('#map', 'au_rainfall_map.vl.json?v=3', { actions: false })
       .catch(err => console.error('Map error:', err));
@@ -38,6 +42,9 @@
 
     vegaEmbed('#boxplot', 'temp_extremes_range.vl.json?v=2', { actions: false })
       .catch(err => console.error('Range error:', err));
+
+    vegaEmbed('#events', 'extreme_events.vl.json?v=1', { actions:false })
+      .catch(err => console.error('Events error:', err));
 
   </script>
 </body>
