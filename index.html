@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Australian Rainfall & Temperature Trends</title>
+  <title>Climate Extremes and Weather Patterns in Australia</title>
 
   <script src="https://cdn.jsdelivr.net/npm/vega@5.30.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.20.1"></script>
@@ -25,12 +25,20 @@
   <p>Mean annual maximum temperature by city with a 5-year rolling average. Hover to highlight a city.</p>
   <div id="temps" class="vis"></div>
 
+  <h2>Temperature Extremes by State (2024)</h2>
+  <p>Distribution of daily minimum and maximum temperatures across Australian states.</p>
+  <div id="boxplot" class="vis"></div>
+
   <script>
     vegaEmbed('#map', 'au_rainfall_map.vl.json?v=3', { actions: false })
       .catch(err => console.error('Map error:', err));
 
     vegaEmbed('#temps', 'temp_trends.vl.json?v=2', { actions: false })
       .catch(err => console.error('Temps error:', err));
+
+    vegaEmbed('#boxplot', 'temp_extremes_range.vl.json?v=2', { actions: false })
+      .catch(err => console.error('Range error:', err));
+
   </script>
 </body>
 </html>
