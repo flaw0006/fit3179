@@ -1,0 +1,52 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Correlation between annual mean max temperature and rainfall by Australian state (1990–2024).",
+  "width": 750,
+  "height": 450,
+
+  "data": { "url": "Correlation_Data/Temp_Rain_Correlation.csv" },
+
+  "transform": [
+    { "filter": "isValid(datum.mean_max_temp_c) && isValid(datum.annual_rainfall_mm)" }
+  ],
+
+  "layer": [
+    {
+      "mark": { "type": "point", "filled": true, "size": 70, "opacity": 0.7 },
+      "encoding": {
+        "x": { "field": "mean_max_temp_c", "type": "quantitative", "title": "Mean Maximum Temperature (°C)" },
+        "y": { "field": "annual_rainfall_mm", "type": "quantitative", "title": "Annual Rainfall (mm)" },
+        "color": { "field": "state", "type": "nominal", "title": "State/Territory", "scale": { "scheme": "tableau10" } },
+        "tooltip": [
+          { "field": "state", "title": "State" },
+          { "field": "year", "title": "Year" },
+          { "field": "mean_max_temp_c", "title": "Mean Max Temp (°C)", "format": ".1f" },
+          { "field": "annual_rainfall_mm", "title": "Rainfall (mm)", "format": ".1f" }
+        ]
+      }
+    },
+
+    {
+      "transform": [
+        { "regression": "annual_rainfall_mm", "on": "mean_max_temp_c", "params": true }
+      ],
+      "mark": { "type": "line", "color": "black", "strokeDash": [4, 3] },
+      "encoding": {
+        "x": { "field": "mean_max_temp_c", "type": "quantitative" },
+        "y": { "field": "annual_rainfall_mm", "type": "quantitative" }
+      }
+    }
+  ],
+
+  "config": {
+    "legend": { "orient": "bottom" },
+    "axis": {
+      "domainColor": "#bbb",
+      "tickColor": "#bbb",
+      "labelColor": "#333",
+      "titleColor": "#333"
+    },
+    "view": { "stroke": null },
+    "background": "white"
+  }
+}
