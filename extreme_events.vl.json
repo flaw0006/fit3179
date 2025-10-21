@@ -1,8 +1,8 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "description": "Extreme weather events per year with a multi-select filter and spike annotations.",
-  "width": 1000,
-  "height": 420,
+  "description": "Extreme weather events per year with interactive filtering and spike annotations.",
+  "width": "container",
+  "height": 450,
 
   "data": { "url": "Extreme_Event_Data/Extreme_Weather_Events_By_Year.csv" },
 
@@ -13,7 +13,7 @@
       "bind": {
         "input": "select",
         "multiple": true,
-        "size": 6,
+        "size": 8,
         "options": [
           "Bushfire",
           "Cyclone",
@@ -23,7 +23,18 @@
           "Landslide",
           "Storm",
           "Tsunami"
-        ]
+        ],
+        "labels": [
+          "Bushfire",
+          "Cyclone",
+          "Earthquake",
+          "Heatwave",
+          "Flood",
+          "Landslide",
+          "Storm",
+          "Tsunami"
+        ],
+        "name": "Filter by event type:"
       }
     }
   ],
@@ -36,56 +47,88 @@
 
   "layer": [
     {
-      "mark": {"type": "bar"},
+      "mark": {
+        "type": "bar",
+        "tooltip": true,
+        "cornerRadiusTopLeft": 2,
+        "cornerRadiusTopRight": 2
+      },
       "encoding": {
         "x": {
           "field": "year",
-          "type": "quantitative",
+          "type": "ordinal",
           "title": "Year",
-          "axis": {"format": "d", "tickCount": 12}
+          "axis": {
+            "labelAngle": -45,
+            "labelFontSize": 12,
+            "titleFontSize": 14
+          }
         },
         "y": {
           "aggregate": "sum",
           "field": "count",
           "type": "quantitative",
-          "title": "Number of events"
+          "title": "Number of Events",
+          "axis": {
+            "titleFontSize": 14,
+            "labelFontSize": 12
+          }
         },
         "color": {
           "field": "event_type",
           "type": "nominal",
-          "title": "Event type",
-          "scale": {"scheme": "tableau10"}
+          "title": "Event Type",
+          "scale": {
+            "scheme": "tableau10"
+          }
         },
         "tooltip": [
-          {"field": "year", "title": "Year", "format": "d"},
+          {"field": "year", "title": "Year"},
           {"field": "event_type", "title": "Type"},
-          {"aggregate": "sum", "field": "count", "title": "Events"}
+          {"aggregate": "sum", "field": "count", "title": "Total Events"}
         ]
       }
     },
 
     {
       "transform": [
-        {"aggregate": [{"op": "sum", "field": "count", "as": "total"}], "groupby": ["year"]},
-        {"window": [{"op": "rank", "as": "rk"}], "sort": [{"field": "total", "order": "descending"}]},
-        {"filter": "datum.rk <= 5"}
+        {
+          "aggregate": [{"op": "sum", "field": "count", "as": "total"}],
+          "groupby": ["year"]
+        },
+        {
+          "window": [{"op": "rank", "as": "rk"}],
+          "sort": [{"field": "total", "order": "descending"}]
+        },
+        {
+          "filter": "datum.rk <= 6"
+        }
       ],
-      "mark": {"type": "text", "dy": -6, "fontWeight": "bold"},
+      "mark": {
+        "type": "text",
+        "dy": -8,
+        "fontWeight": "bold",
+        "fontSize": 12
+      },
       "encoding": {
-        "x": {"field": "year", "type": "quantitative"},
+        "x": {"field": "year", "type": "ordinal"},
         "y": {"field": "total", "type": "quantitative"},
         "text": {"field": "year"},
-        "color": {"value": "#444"}
+        "color": {"value": "#333"}
       }
     }
   ],
 
   "config": {
-    "legend": {"orient": "bottom"},
+    "legend": {
+      "orient": "bottom",
+      "labelFontSize": 12,
+      "titleFontSize": 14
+    },
     "axis": {
       "grid": false,
-      "domainColor": "#bbb",
-      "tickColor": "#bbb",
+      "domainColor": "#ccc",
+      "tickColor": "#ccc",
       "labelColor": "#333",
       "titleColor": "#333"
     },
