@@ -1,20 +1,104 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "description": "Change in Australia's record high temperatures over time.",
-  "width": 800,
-  "height": 400,
-  "data": { "url": "Timeline_Data/Record_High_Temps.csv", "format": {"type": "csv"} },
-  "transform": [
-    { "calculate": "toDate(datum.date, '%d/%m/%Y')", "as": "date_parsed" }
+  "description": "Australia’s official record-high temperature events mapped by station. Drag to pan; scroll to zoom.",
+  "width": "container",
+  "height": 520,
+
+  "projection": { "type": "mercator", "center": [134, -26], "scale": 850 },
+
+  "layer": [
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/rowanhogan/australian-states/master/states.geojson",
+        "format": { "type": "json", "property": "features" }
+      },
+      "mark": {
+        "type": "geoshape",
+        "fill": "#f6f7f8",
+        "stroke": "#cfd5dc",
+        "strokeWidth": 0.8
+      }
+    },
+
+    {
+      "data": { "url": "Timeline_Data/Record_High_Temps.csv", "format": { "type": "csv" } },
+      "transform": [
+        { "calculate": "toDate(datum.date, '%d/%m/%Y')", "as": "parsed_date" },
+        { "calculate": "year(toDate(datum.date, '%d/%m/%Y'))", "as": "yr" }
+      ],
+      "params": [
+        {
+          "name": "hotHover",
+          "select": {
+            "type": "point",
+            "fields": ["station"],
+            "on": "pointerover",
+            "clear": "mouseout"
+          }
+        }
+      ],
+      "mark": { "type": "circle", "tooltip": true, "stroke": "#2b2f36", "strokeWidth": 0.6 },
+      "encoding": {
+        "longitude": { "field": "longitude", "type": "quantitative" },
+        "latitude": { "field": "latitude", "type": "quantitative" },
+        "color": {
+          "field": "value_c",
+          "type": "quantitative",
+          "title": null,
+          "scale": { "scheme": "orangered", "domain": [46, 51] },
+          "legend": null
+        },
+        "size": {
+          "field": "value_c",
+          "type": "quantitative",
+          "scale": { "type": "sqrt", "range": [60, 300] },
+          "legend": null
+        },
+        "opacity": {
+          "condition": { "param": "hotHover", "value": 1 },
+          "value": 0.9
+        },
+        "order": { "field": "value_c", "type": "quantitative", "sort": "descending" },
+        "tooltip": [
+          { "field": "station", "title": "Station" },
+          { "field": "state", "title": "State" },
+          { "field": "value_c", "title": "Temperature (°C)", "format": ".1f" },
+          { "field": "date", "title": "Date" },
+          { "field": "desc", "title": "Context" }
+        ]
+      }
+    },
+
+    {
+      "data": { "url": "Timeline_Data/Record_High_Temps.csv", "format": { "type": "csv" } },
+      "transform": [
+        { "calculate": "toDate(datum.date, '%d/%m/%Y')", "as": "parsed_date" },
+        { "filter": "datum.value_c >= 50.7" }
+      ],
+      "mark": {
+        "type": "text",
+        "dx": 8,
+        "dy": -6,
+        "align": "left",
+        "fontSize": 12,
+        "fontWeight": "bold",
+        "color": "#374151"
+      },
+      "encoding": {
+        "longitude": { "field": "longitude", "type": "quantitative" },
+        "latitude": { "field": "latitude", "type": "quantitative" },
+        "text": { "field": "station" }
+      }
+    }
   ],
-  "mark": { "type": "line", "point": { "filled": true, "size": 90 } },
-  "encoding": {
-    "x": { "field": "date_parsed", "type": "temporal", "title": "Year" },
-    "y": { "field": "value_c", "type": "quantitative", "title": "Record Temperature (°C)" },
-    "color": { "field": "state", "type": "nominal", "title": "State" },
-    "tooltip": [
-      {"field": "station"}, {"field": "state"}, {"field": "date"}, {"field": "value_c", "title": "Temperature (°C)"}, {"field": "desc"}
-    ]
-  },
-  "title": "Evolution of Australia's Record High Temperatures"
+
+  "config": {
+    "legend": null,
+    "view": { "stroke": null },
+    "background": "white",
+    "axis": {
+      "labelColor": "#1f2937",
+      "titleColor": "#1f2937"
+    }
+  }
 }

@@ -1,7 +1,7 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "description": "Correlation between annual mean max temperature and rainfall by Australian state (1990–2024).",
-  "width": 750,
+  "description": "Relationship between annual mean max temperature and rainfall by Australian state (1990–2024).",
+  "width": "container",
   "height": 450,
 
   "data": { "url": "Correlation_Data/Temp_Rain_Correlation.csv" },
@@ -12,11 +12,45 @@
 
   "layer": [
     {
-      "mark": { "type": "point", "filled": true, "size": 70, "opacity": 0.7 },
+      "mark": {
+        "type": "point",
+        "filled": true,
+        "size": 60,
+        "opacity": 0.65,
+        "tooltip": true
+      },
       "encoding": {
-        "x": { "field": "mean_max_temp_c", "type": "quantitative", "title": "Mean Maximum Temperature (°C)" },
-        "y": { "field": "annual_rainfall_mm", "type": "quantitative", "title": "Annual Rainfall (mm)" },
-        "color": { "field": "state", "type": "nominal", "title": "State/Territory", "scale": { "scheme": "tableau10" } },
+        "x": {
+          "field": "mean_max_temp_c",
+          "type": "quantitative",
+          "title": "Mean Maximum Temperature (°C)",
+          "axis": {
+            "labelFontSize": 12,
+            "titleFontSize": 14,
+            "tickCount": 10
+          }
+        },
+        "y": {
+          "field": "annual_rainfall_mm",
+          "type": "quantitative",
+          "title": "Annual Rainfall (mm)",
+          "axis": {
+            "labelFontSize": 12,
+            "titleFontSize": 14,
+            "tickCount": 10
+          }
+        },
+        "color": {
+          "field": "state",
+          "type": "nominal",
+          "title": "State or Territory",
+          "scale": { "scheme": "category10" },
+          "legend": {
+            "orient": "bottom",
+            "labelFontSize": 12,
+            "titleFontSize": 14
+          }
+        },
         "tooltip": [
           { "field": "state", "title": "State" },
           { "field": "year", "title": "Year" },
@@ -28,21 +62,60 @@
 
     {
       "transform": [
-        { "regression": "annual_rainfall_mm", "on": "mean_max_temp_c", "params": true }
+        {
+          "regression": "annual_rainfall_mm",
+          "on": "mean_max_temp_c",
+          "params": true
+        }
       ],
-      "mark": { "type": "line", "color": "black", "strokeDash": [4, 3] },
+      "mark": {
+        "type": "line",
+        "color": "#333",
+        "strokeDash": [4, 3],
+        "tooltip": true
+      },
       "encoding": {
         "x": { "field": "mean_max_temp_c", "type": "quantitative" },
-        "y": { "field": "annual_rainfall_mm", "type": "quantitative" }
+        "y": { "field": "annual_rainfall_mm", "type": "quantitative" },
+        "tooltip": [
+          { "field": "params.slope", "title": "Slope", "format": ".2f" },
+          { "field": "params.intercept", "title": "Intercept", "format": ".2f" },
+          { "field": "params.rSquared", "title": "R²", "format": ".2f" }
+        ]
       }
     }
+
+    
   ],
 
+  "params": [
+  {
+    "name": "yearSelect",
+    "value": 2024,
+    "bind": {
+      "input": "range",
+      "min": 1990,
+      "max": 2024,
+      "step": 1,
+      "name": "Select Year:"
+    }
+  }
+],
+
+"transform": [
+  {
+    "filter": "datum.year == yearSelect"
+  },
+  {
+    "filter": "isValid(datum.mean_max_temp_c) && isValid(datum.annual_rainfall_mm)"
+  }
+],
+
+
   "config": {
-    "legend": { "orient": "bottom" },
     "axis": {
-      "domainColor": "#bbb",
-      "tickColor": "#bbb",
+      "domainColor": "#ccc",
+      "tickColor": "#ccc",
       "labelColor": "#333",
       "titleColor": "#333"
     },

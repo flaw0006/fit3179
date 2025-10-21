@@ -1,6 +1,7 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "description": "Mean annual maximum temperature by city (5-year rolling average), 1990 onwards.",
+  "description": "Mean annual maximum temperature by city (5-year rolling average), 1940 onwards.",
+  
   "width": "container",
   "height": 420,
 
@@ -8,7 +9,7 @@
 
   "transform": [
     { "calculate": "toNumber(datum.year)", "as": "year_num" },
-    { "filter": "datum.year_num >= 1990" },
+    { "filter": "datum.year_num >= 1940" },
     {
       "window": [{ "op": "mean", "field": "temp_c", "as": "temp_roll5" }],
       "frame": [-2, 2],

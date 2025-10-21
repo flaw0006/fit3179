@@ -117,7 +117,7 @@
 
     <section id="extremes" class="card">
       <h2>Temperature Extremes by State</h2>
-      <p class="lead">Daily minimum and maximum temperatures across Australia reveal striking contrasts between regions. Warmer northern states such as the Northern Territory and Queensland experience higher overall maxima, while cooler southern regions record the lowest minima.</p>
+      <p class="lead">Daily minimum and maximum temperatures across Australia reveal striking contrasts between regions. Warmer northern states such as the Northern Territory and Queensland and the Northern Territory experience higher overall maxima, while cooler southern regions record the lowest minima.</p>
       <div class="figure">
         <div id="boxplot" class="vis" role="img" aria-label="Boxplots of temperature extremes"></div>
         <div class="caption">Dumbbell lines show the full observed range between daily minimum and maximum temperatures for each state or territory in 2024.
@@ -135,29 +135,37 @@
     </section>
 
     <section id="correlation" class="card">
-      <h2>Temperature–rainfall relationship</h2>
-      <p class="lead">How annual mean maximum temperature relates to rainfall by state, 1990–2024.</p>
+      <h2>How Temperature Shapes Australia’s Rainfall Patterns</h2>
+      <p class="lead">This visualization explores the complex relationship between temperature and rainfall across Australia's diverse climate zones from 1990 to 2024. Each dot represents a location within a state or territory, showing how mean maximum temperature (°C) correlates with annual rainfall (mm). Queensland shows high variability in rainfall despite warmer temperatures.”</p>
       <div class="figure">
         <div id="corr" class="vis"></div>
-        <div class="caption">Use brushing/hover (if enabled) to read exact values.</div>
+        <div class="caption">Hover over dots to read exact values.</div>
       </div>
     </section>
 
     <section id="timeline" class="card">
-      <h2>Timeline of major climate extremes</h2>
-      <p class="lead">Australia’s official record-high temperature events. Drag to pan; scroll to zoom.</p>
+      <h2>Australia’s Record Heat Moments</h2>
+      <p class="lead">Mapping the nation’s most extreme temperatures — where and when Australia hit boiling point.</p>
       <div class="figure">
         <div id="timelineVis" class="vis"></div>
-        <div class="caption">Events annotated with station, state, and context.</div>
+        <div class="caption">Each circle marks a record-high event, labelled by station and temperature — a snapshot of Australia’s hottest days in history.</div>
       </div>
     </section>
 
     <footer>
       <div class="meta">
-        <div><strong>Author:</strong> Franz J — <span class="dot"></span> <strong>Date:</strong> 2025</div>
-        <div><strong>Sources:</strong> cite data repositories and URLs here (icons/images must be licensed and attributed). :contentReference[oaicite:4]{index=4}</div>
-        <div><strong>Notes:</strong> Vega-Lite specs are published in the same GitHub repo for readability. :contentReference[oaicite:5]{index=5}</div>
-      </div>
+        <div><strong>Author:</strong> Franz Lawrence (33905711) <span class="dot"></span> <strong>Date:</strong> 2025</div>
+        <div><strong>Sources:</strong></div>
+
+        <ul> <li><em>Australian Daily Extremes Tables</em>. (2025). Bureau of Meteorology. <a href="https://www.bom.gov.au/cgi-bin/climate/extremes/annual_extremes.cgi?period=%2Fcgi-bin%2Fclimate%2Fextremes%2Fannual_extremes.cgi&climtab=rain_high&area=aus&year=2025" target="_blank">bom.gov.au</a></li>
+
+        <li>Australian Government. (2009). <em>Australian disasters | Disaster Mapper</em>. <a href="https://knowledge.aidr.org.au/disasters/" target="_blank">aidr.org.au</a></li>
+
+        <li><em>Climate Data Online – Map Search</em>. (n.d.). Bureau of Meteorology. <a href="https://reg.bom.gov.au/climate/data/index.shtml?bookmark=136" target="_blank">reg.bom.gov.au</a></li>
+
+        <li><em>Microsoft Copilot</em>. (2025). Microsoft. <a href="https://copilot.microsoft.com/" target="_blank">copilot.microsoft.com</a></li>
+
+        <li>rowanhogan. (2025). <em>Australian States GeoJSON</em>. GitHub. <a href="https://github.com/rowanhogan/australian-states/blame/master/states.geojson" target="_blank">github.com</a></li> </ul>      </div>
     </footer>
   </main>
 
