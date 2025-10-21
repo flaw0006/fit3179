@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-AU">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Climate Extremes and Weather Patterns in Australia</title>
 
   <script src="https://cdn.jsdelivr.net/npm/vega@5.30.0"></script>
@@ -10,51 +10,204 @@
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.25.0"></script>
 
   <style>
-    body { font-family: Arial, sans-serif; margin: 40px; background: #f9f9f9; color: #333; }
-    h1, h2, p { text-align: center; }
-    .vis { margin: 24px auto; max-width: 1000px; }
-    #map, #temps { min-height: 200px; }
+    /* ---------------------- CSS ---------------------- */
+    :root{
+      --bg: #f7f7f8;
+      --surface: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --brand: #0ea5e9;          /* subtle blue accent */
+      --brand-ink: #0369a1;
+      --border: #e5e7eb;
+      --radius: 18px;
+      --shadow: 0 6px 18px rgba(0,0,0,.06);
+      --maxw: 1100px;
+
+      --h1: clamp(1.8rem, 1.4rem + 1.6vw, 2.4rem);
+      --h2: clamp(1.3rem, 1.1rem + .9vw, 1.6rem);
+      --base: 16px;
+      --leading: 1.65;
+      --space: 20px;
+    }
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg: #0b0f14;
+        --surface: #0f1720;
+        --text: #dbe6f2;
+        --muted: #93a4b8;
+        --brand: #38bdf8;
+        --brand-ink: #7dd3fc;
+        --border: #233243;
+        --shadow: 0 8px 24px rgba(0,0,0,.4);
+      }
+    }
+
+    /* ---------------------- Base ---------------------- */
+    html,body{height:100%}
+    body{
+      margin:0;
+      font: 400 var(--base)/var(--leading) ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--text);
+      background: radial-gradient(1200px 400px at 50% -200px, rgba(14,165,233,.08), transparent 60%), var(--bg);
+    }
+    .container{max-width: var(--maxw); margin: 0 auto; padding: 0 20px;}
+
+    /* ---------------------- Header / nav ---------------------- */
+    .site-header{
+      position: sticky; top: 0; z-index: 10;
+      backdrop-filter: saturate(120%) blur(6px);
+      background: color-mix(in srgb, var(--bg) 82%, transparent);
+      border-bottom: 1px solid var(--border);
+    }
+    .site-header .bar{
+      display:flex; align-items:center; gap:16px;
+      padding: 12px 20px;
+    }
+    .brand{
+      font-weight: 700; letter-spacing:.2px; color: var(--brand-ink);
+    }
+    nav a{
+      color: var(--muted); text-decoration:none; padding:8px 10px; border-radius:10px;
+    }
+    nav a:hover{ color: var(--brand-ink); background: color-mix(in srgb, var(--brand) 12%, transparent); }
+
+    /* ---------------------- Hero ---------------------- */
+    .hero{ padding: 36px 0 20px; text-align: center;}
+    h1{ font-size: var(--h1); margin: 0 0 8px; }
+    .subtitle{ color: var(--muted); max-width: 800px; margin: 0 auto; }
+
+    /* ---------------------- Section cards ---------------------- */
+    section{ scroll-margin-top: 80px; }
+    .card{
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: clamp(16px, 2vw, 24px);
+      margin: 28px 0;
+    }
+    .card h2{ font-size: var(--h2); margin: 0 0 6px; text-align: left;}
+    .card p.lead{ margin: 0 0 16px; color: var(--muted); }
+    .figure{ display:grid; gap:12px; }
+    .vis{ min-height: 220px; }
+    .caption{
+      font-size: .95rem; color: var(--muted);
+      border-top: 1px dashed var(--border);
+      padding-top: 10px;
+    }
+
+    /* ---------------------- Grid helper (if needed later) ---------------------- */
+    .grid{ display:grid; gap: 22px; }
+    @media (min-width: 900px){
+      .grid.two{ grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ---------------------- Footer ---------------------- */
+    footer{
+      margin: 40px 0 60px; color: var(--muted); font-size: .95rem;
+      border-top: 1px solid var(--border); padding-top: 16px;
+    }
+    .meta{ display:flex; flex-wrap:wrap; gap: 14px 22px; align-items:center;}
+    .dot::before{content:"•"; margin: 0 8px; color: var(--border);}
+
+    /* ---------------------- Accessibility niceties ---------------------- */
+    .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    a:focus-visible, button:focus-visible{ outline: 3px solid var(--brand); outline-offset: 2px; border-radius: 10px; }
   </style>
 </head>
+
 <body>
-  <h1>Average Annual Rainfall across Australia</h1>
-  <p>Visualising long-term mean annual rainfall (mm) by state and territory.</p>
-  <div id="map" class="vis"></div>
+  <header class="site-header">
+    <div class="container bar">
+      <div class="brand">Visualizing Climate Variability Across Australia</div>
+      <nav aria-label="Section navigation">
+        <a href="#rainfall">Rainfall</a>
+        <a href="#trends">Annual Temps</a>
+        <a href="#extremes">Extremes</a>
+        <a href="#events">Events</a>
+        <a href="#correlation">Correlation</a>
+        <a href="#timeline">Timeline</a>
+      </nav>
+    </div>
+  </header>
 
-  <h2>Annual Temperature Trends</h2>
-  <p>Mean annual maximum temperature by city with a 5-year rolling average. Hover to highlight a city.</p>
-  <div id="temps" class="vis"></div>
+  <main class="container">
+    <section class="hero">
+      <h1>Visualizing Climate Variability Across Australia</h1>
+      <p class="subtitle">Exploring Long-Term Patterns of Rainfall, Temperature, and Extreme Weather Across the Continent.</p>
+    </section>
 
-  <h2>Temperature Extremes by State (2024)</h2>
-  <p>Distribution of daily minimum and maximum temperatures across Australian states.</p>
-  <div id="boxplot" class="vis"></div>
+    <section id="rainfall" class="card">
+      <h2>Average Annual Rainfall Across Australia</h2>
+      <p class="lead">Australia’s climate is defined by sharp contrasts, from the humid tropics to the arid interior. This map illustrates the uneven distribution of average annual rainfall across the continent. Using a gradient of blue tones, it reveals how geography and prevailing weather systems shape regional precipitation patterns.</p>
+      <div class="figure">
+        <div id="map" class="vis" role="img" aria-label="Average annual rainfall map"></div>
+        <div class="caption">Darker shades indicate higher mean annual rainfall (mm). Hover over a state to view its average annual rainfall.</div>
+      </div>
+    </section>
 
-  <h2>Extreme Weather Events per Year</h2>
-  <p>Click legend to filter one or more event types. Notable spike years are labeled.</p>
-  <div id="events" class="vis"></div>
+    <section id="trends" class="card">
+      <h2>Annual temperature trends</h2>
+      <p class="lead">Mean annual maximum temperature by city with a 5-year rolling average. Hover to highlight a city.</p>
+      <div class="figure">
+        <div id="temps" class="vis" role="img" aria-label="Temperature trend lines by city"></div>
+        <div class="caption">Rolling averages smooth short-term variability to emphasise longer-term patterns.</div>
+      </div>
+    </section>
 
-  <h2>Correlation Between Temperature and Rainfall</h2>
-  <p>Exploring the relationship between annual mean maximum temperature and rainfall across Australian states (1990–2024).</p>
-  <div id="corr" class="vis"></div>
+    <section id="extremes" class="card">
+      <h2>Temperature extremes by state (2024)</h2>
+      <p class="lead">Distribution of daily minima and maxima across states.</p>
+      <div class="figure">
+        <div id="boxplot" class="vis" role="img" aria-label="Boxplots of temperature extremes"></div>
+        <div class="caption">Each box shows quartiles; whiskers show full observed range.</div>
+      </div>
+    </section>
 
+    <section id="events" class="card">
+      <h2>Extreme weather events per year</h2>
+      <p class="lead">Click the legend to focus on one or more event types. Spike years are labelled.</p>
+      <div class="figure">
+        <div id="eventsVis" class="vis"></div>
+        <div class="caption">Counts reflect recorded events from selected sources; see data notes below.</div>
+      </div>
+    </section>
+
+    <section id="correlation" class="card">
+      <h2>Temperature–rainfall relationship</h2>
+      <p class="lead">How annual mean maximum temperature relates to rainfall by state, 1990–2024.</p>
+      <div class="figure">
+        <div id="corr" class="vis"></div>
+        <div class="caption">Use brushing/hover (if enabled) to read exact values.</div>
+      </div>
+    </section>
+
+    <section id="timeline" class="card">
+      <h2>Timeline of major climate extremes</h2>
+      <p class="lead">Australia’s official record-high temperature events. Drag to pan; scroll to zoom.</p>
+      <div class="figure">
+        <div id="timelineVis" class="vis"></div>
+        <div class="caption">Events annotated with station, state, and context.</div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="meta">
+        <div><strong>Author:</strong> Franz J — <span class="dot"></span> <strong>Date:</strong> 2025</div>
+        <div><strong>Sources:</strong> cite data repositories and URLs here (icons/images must be licensed and attributed). :contentReference[oaicite:4]{index=4}</div>
+        <div><strong>Notes:</strong> Vega-Lite specs are published in the same GitHub repo for readability. :contentReference[oaicite:5]{index=5}</div>
+      </div>
+    </footer>
+  </main>
 
   <script>
-    vegaEmbed('#map', 'au_rainfall_map.vl.json?v=3', { actions: false })
-      .catch(err => console.error('Map error:', err));
-
-    vegaEmbed('#temps', 'temp_trends.vl.json?v=2', { actions: false })
-      .catch(err => console.error('Temps error:', err));
-
-    vegaEmbed('#boxplot', 'temp_extremes_range.vl.json?v=2', { actions: false })
-      .catch(err => console.error('Range error:', err));
-
-    vegaEmbed('#events', 'extreme_events.vl.json?v=1', { actions:false })
-      .catch(err => console.error('Events error:', err));
-
-    vegaEmbed('#corr', 'temp_rain_corr.vl.json?v=1', { actions: false })
-      .catch(err => console.error('Correlation error:', err));
-
-
+    // Keep your existing Vega specs/paths; IDs changed for events/timeline to avoid clashes
+    vegaEmbed('#map', 'au_rainfall_map.vl.json?v=3', { actions:false }).catch(console.error);
+    vegaEmbed('#temps', 'temp_trends.vl.json?v=2', { actions:false }).catch(console.error);
+    vegaEmbed('#boxplot', 'temp_extremes_range.vl.json?v=2', { actions:false }).catch(console.error);
+    vegaEmbed('#eventsVis', 'extreme_events.vl.json?v=1', { actions:false }).catch(console.error);
+    vegaEmbed('#corr', 'temp_rain_corr.vl.json?v=1', { actions:false }).catch(console.error);
+    vegaEmbed('#timelineVis', 'timeline_record_highs.vl.json?v=1', { actions:false }).catch(console.error);
   </script>
 </body>
 </html>
