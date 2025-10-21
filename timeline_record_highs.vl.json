@@ -1,0 +1,20 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Change in Australia's record high temperatures over time.",
+  "width": 800,
+  "height": 400,
+  "data": { "url": "Timeline_Data/Record_High_Temps.csv", "format": {"type": "csv"} },
+  "transform": [
+    { "calculate": "toDate(datum.date, '%d/%m/%Y')", "as": "date_parsed" }
+  ],
+  "mark": { "type": "line", "point": { "filled": true, "size": 90 } },
+  "encoding": {
+    "x": { "field": "date_parsed", "type": "temporal", "title": "Year" },
+    "y": { "field": "value_c", "type": "quantitative", "title": "Record Temperature (°C)" },
+    "color": { "field": "state", "type": "nominal", "title": "State" },
+    "tooltip": [
+      {"field": "station"}, {"field": "state"}, {"field": "date"}, {"field": "value_c", "title": "Temperature (°C)"}, {"field": "desc"}
+    ]
+  },
+  "title": "Evolution of Australia's Record High Temperatures"
+}

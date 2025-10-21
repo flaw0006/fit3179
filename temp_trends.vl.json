@@ -1,14 +1,14 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "description": "Mean annual maximum temperature by city (5-year rolling average), 1940 onwards. Clean styling like the stock example.",
-  "width": 1000,
+  "description": "Mean annual maximum temperature by city (5-year rolling average), 1990 onwards.",
+  "width": "container",
   "height": 420,
 
   "data": { "url": "Temp_Data/Mean_Max_Temp_By_City.csv" },
 
   "transform": [
     { "calculate": "toNumber(datum.year)", "as": "year_num" },
-    { "filter": "datum.year_num >= 1940" },
+    { "filter": "datum.year_num >= 1990" },
     {
       "window": [{ "op": "mean", "field": "temp_c", "as": "temp_roll5" }],
       "frame": [-2, 2],
@@ -17,42 +17,56 @@
     }
   ],
 
-  "mark": { "type": "line", "interpolate": "monotone", "strokeWidth": 2.5 },
+  "layer": [
+    {
+      "params": [
+        {
+          "name": "hoverCity",
+          "select": { "type": "point", "fields": ["city"], "on": "pointerover", "clear": "mouseout" }
+        }
+      ],
+      "mark": { "type": "line", "interpolate": "monotone", "strokeWidth": 2.2 },
+      "encoding": {
+        "x": {
+          "field": "year_num", "type": "quantitative", "title": "Year",
+          "axis": { "format": "d", "tickCount": 9, "grid": false }
+        },
+        "y": {
+          "field": "temp_roll5", "type": "quantitative",
+          "title": "Mean max temperature (°C)", "axis": { "grid": false }
+        },
+        "color": { "field": "city", "type": "nominal", "title": "City", "scale": { "scheme": "tableau10" } },
+        "opacity": { "condition": { "param": "hoverCity", "value": 1 }, "value": 0.35 },
+        "strokeWidth": { "condition": { "param": "hoverCity", "value": 3.2 }, "value": 2.2 },
+        "tooltip": [
+          { "field": "city", "title": "City" },
+          { "field": "year_num", "title": "Year", "format": "d" },
+          { "field": "temp_roll5", "title": "5-yr avg (°C)", "format": ".1f" }
+        ]
+      }
+    },
 
-  "encoding": {
-    "x": {
-      "field": "year_num",
-      "type": "quantitative",
-      "title": "Year",
-      "axis": { "format": "d", "tickCount": 9, "grid": false }
-    },
-    "y": {
-      "field": "temp_roll5",
-      "type": "quantitative",
-      "title": "Mean max temperature (°C)",
-      "axis": { "grid": false }
-    },
-    "color": {
-      "field": "city",
-      "type": "nominal",
-      "title": "City",
-      "scale": { "scheme": "tableau10" }
-    },
-    "tooltip": [
-      { "field": "city", "title": "City" },
-      { "field": "year_num", "title": "Year", "format": "d" },
-      { "field": "temp_roll5", "title": "5-yr avg (°C)", "format": ".1f" }
-    ]
-  },
+    {
+      "transform": [
+        { "window": [{ "op": "row_number", "as": "rn" }],
+          "sort": [{ "field": "year_num", "order": "descending" }],
+          "groupby": ["city"] },
+        { "filter": "datum.rn === 1" }
+      ],
+      "mark": { "type": "text", "dx": 6, "align": "left", "baseline": "middle", "fontSize": 11 },
+      "encoding": {
+        "x": { "field": "year_num", "type": "quantitative" },
+        "y": { "field": "temp_roll5", "type": "quantitative" },
+        "text": { "field": "city" },
+        "color": { "field": "city", "type": "nominal", "legend": null },
+        "opacity": { "condition": { "param": "hoverCity", "value": 1 }, "value": 0.6 }
+      }
+    }
+  ],
 
   "config": {
     "legend": { "orient": "bottom" },
-    "axis": {
-      "domainColor": "#bbb",
-      "tickColor": "#bbb",
-      "labelColor": "#333",
-      "titleColor": "#333"
-    },
+    "axis": { "domainColor": "#bbb", "tickColor": "#bbb", "labelColor": "#333", "titleColor": "#333" },
     "view": { "stroke": null },
     "background": "white"
   }

@@ -10,13 +10,12 @@
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.25.0"></script>
 
   <style>
-    /* ---------------------- CSS ---------------------- */
     :root{
       --bg: #f7f7f8;
       --surface: #ffffff;
       --text: #1f2937;
       --muted: #6b7280;
-      --brand: #0ea5e9;          /* subtle blue accent */
+      --brand: #0ea5e9;          
       --brand-ink: #0369a1;
       --border: #e5e7eb;
       --radius: 18px;
@@ -28,18 +27,6 @@
       --base: 16px;
       --leading: 1.65;
       --space: 20px;
-    }
-    @media (prefers-color-scheme: dark){
-      :root{
-        --bg: #0b0f14;
-        --surface: #0f1720;
-        --text: #dbe6f2;
-        --muted: #93a4b8;
-        --brand: #38bdf8;
-        --brand-ink: #7dd3fc;
-        --border: #233243;
-        --shadow: 0 8px 24px rgba(0,0,0,.4);
-      }
     }
 
     /* ---------------------- Base ---------------------- */
@@ -89,7 +76,12 @@
     .card h2{ font-size: var(--h2); margin: 0 0 6px; text-align: left;}
     .card p.lead{ margin: 0 0 16px; color: var(--muted); }
     .figure{ display:grid; gap:12px; }
-    .vis{ min-height: 220px; }
+    .vis {
+      min-height: 220px;
+      display: flex;
+      justify-content: center;   
+      align-items: center;       
+    }
     .caption{
       font-size: .95rem; color: var(--muted);
       border-top: 1px dashed var(--border);
@@ -117,19 +109,6 @@
 </head>
 
 <body>
-  <header class="site-header">
-    <div class="container bar">
-      <div class="brand">Visualizing Climate Variability Across Australia</div>
-      <nav aria-label="Section navigation">
-        <a href="#rainfall">Rainfall</a>
-        <a href="#trends">Annual Temps</a>
-        <a href="#extremes">Extremes</a>
-        <a href="#events">Events</a>
-        <a href="#correlation">Correlation</a>
-        <a href="#timeline">Timeline</a>
-      </nav>
-    </div>
-  </header>
 
   <main class="container">
     <section class="hero">
@@ -147,11 +126,11 @@
     </section>
 
     <section id="trends" class="card">
-      <h2>Annual temperature trends</h2>
-      <p class="lead">Mean annual maximum temperature by city with a 5-year rolling average. Hover to highlight a city.</p>
+      <h2>Rising Heat: Long-Term Temperature Trends Across Australian Cities</h2>
+      <p class="lead">Five-year rolling averages of mean annual maximum temperature reveal persistent warmth in northern cities such as Darwin and Brisbane, while southern cities like Hobart and Melbourne remain cooler but are also trending upwards.</p>
       <div class="figure">
         <div id="temps" class="vis" role="img" aria-label="Temperature trend lines by city"></div>
-        <div class="caption">Rolling averages smooth short-term variability to emphasise longer-term patterns.</div>
+        <div class="caption">Rolling averages smooth out year-to-year variability, highlighting gradual warming across most cities since the 1990s. Darwin continues to record the highest long-term averages, with Brisbane and Perth following closely.</div>
       </div>
     </section>
 
@@ -201,7 +180,6 @@
   </main>
 
   <script>
-    // Keep your existing Vega specs/paths; IDs changed for events/timeline to avoid clashes
     vegaEmbed('#map', 'au_rainfall_map.vl.json?v=3', { actions:false }).catch(console.error);
     vegaEmbed('#temps', 'temp_trends.vl.json?v=2', { actions:false }).catch(console.error);
     vegaEmbed('#boxplot', 'temp_extremes_range.vl.json?v=2', { actions:false }).catch(console.error);
