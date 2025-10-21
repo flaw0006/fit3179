@@ -1,56 +1,113 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "description": "Min–max temperature range by state (2024). Uses rule + endpoints (dumbbell).",
-  "width": 720,
+  "description": "Min–max temperature range by state (2024). Clean dumbbell with correct label placement and single Y-axis.",
+  "width": "container",
   "height": 420,
+
   "data": { "url": "Min_Max_Temp_Data/Clean_MinMax_Temp.csv" },
 
   "transform": [
-    {"calculate": "toNumber(datum.year)", "as": "year_num"},
-    {"filter": "datum.year_num == 2024"},
-
-    {"calculate": "datum.state === 'Southern Australia' ? 'South Australia' : datum.state", "as": "state_fix"},
-
-    {"pivot": "type", "value": "temp", "groupby": ["state_fix"]},
-    {"calculate": "toNumber(datum.min)", "as": "min_c"},
-    {"calculate": "toNumber(datum.max)", "as": "max_c"}
+    { "calculate": "toNumber(datum.year)", "as": "year_num" },
+    { "filter": "datum.year_num == 2024" },
+    { "calculate": "datum.state === 'Southern Australia' ? 'South Australia' : datum.state", "as": "state_fix" },
+    { "pivot": "type", "value": "temp", "groupby": ["state_fix"] },
+    { "calculate": "toNumber(datum.min)", "as": "min_c" },
+    { "calculate": "toNumber(datum.max)", "as": "max_c" },
+    { "calculate": "datum.max_c - datum.min_c", "as": "range_c" }
   ],
+
+  "encoding": {
+    "x": {
+      "field": "state_fix",
+      "type": "nominal",
+      "title": "State",
+      "sort": { "field": "range_c", "order": "descending" },
+      "axis": { "labelAngle": 0 }
+    }
+  },
 
   "layer": [
     {
-      "mark": {"type": "rule", "strokeWidth": 3},
+      "params": [
+        {
+          "name": "stateSelect",
+          "select": { "type": "point", "fields": ["state_fix"], "on": "click", "toggle": "event.shiftKey", "empty": false }
+        }
+      ],
+      "mark": { "type": "rule", "strokeWidth": 2.5, "clip": true },
       "encoding": {
-        "x": {"field": "state_fix", "type": "nominal", "title": "State/Territory", "axis": {"labelAngle": 0}},
-        "y": {"field": "min_c", "type": "quantitative", "title": "Temperature (°C)"},
-        "y2": {"field": "max_c"},
-        "color": {"value": "#888"}  
+        "y": {
+          "field": "min_c",
+          "type": "quantitative",
+          "title": "Temperature (°C)",
+          "axis": { "orient": "left" }
+        },
+        "y2": { "field": "max_c" },
+        "color": { "value": "#b0b7bf" },
+        "opacity": { "condition": { "param": "stateSelect", "value": 1 }, "value": 0.35 }
       }
     },
+
     {
-      "transform": [{"fold": ["min_c", "max_c"], "as": ["which", "temp_c"]}],
-      "mark": {"type": "point", "filled": true, "size": 80},
+      "transform": [{ "fold": ["min_c", "max_c"], "as": ["which", "temp_c"] }],
+      "mark": { "type": "point", "filled": true, "clip": true },
       "encoding": {
-        "x": {"field": "state_fix", "type": "nominal"},
-        "y": {"field": "temp_c", "type": "quantitative"},
+        "y": { "field": "temp_c", "type": "quantitative", "axis": null },
         "color": {
           "field": "which",
           "type": "nominal",
-          "title": "Extreme",
-          "scale": {"domain": ["min_c", "max_c"], "range": ["#2C7BB6", "#D7191C"]},
-          "legend": {"orient": "bottom", "labelExpr": "datum.value==='min_c' ? 'Min' : 'Max'"}
+          "title": "Type of Extreme",
+          "scale": { "domain": ["min_c", "max_c"], "range": ["#3b82f6", "#ef4444"] },
+          "legend": {
+            "orient": "bottom",
+            "values": ["min_c", "max_c"],
+            "labelExpr": "datum.value==='min_c' ? 'Min' : 'Max'"
+          }
         },
+        "size": { "value": 80 },
+        "opacity": { "condition": { "param": "stateSelect", "value": 1 }, "value": 0.7 },
         "tooltip": [
-          {"field": "state_fix", "title": "State"},
-          {"field": "min_c", "title": "Min (°C)", "format": ".1f"},
-          {"field": "max_c", "title": "Max (°C)", "format": ".1f"}
+          { "field": "state_fix", "title": "State" },
+          { "field": "min_c", "title": "Min (°C)", "format": ".1f" },
+          { "field": "max_c", "title": "Max (°C)", "format": ".1f" },
+          { "field": "range_c", "title": "Range (°C)", "format": ".1f" }
         ]
+      }
+    },
+
+    {
+      "transform": [{ "filter": { "param": "stateSelect" } }],
+      "mark": { "type": "text", "fontSize": 11, "baseline": "middle", "clip": true },
+      "encoding": {
+        "y": { "field": "max_c", "type": "quantitative" },
+        "text": { "field": "max_c", "type": "quantitative", "format": ".1f" },
+        "yOffset": { "value": -10 },
+        "color": { "value": "#ef4444" }
+      }
+    },
+
+    {
+      "transform": [{ "filter": { "param": "stateSelect" } }],
+      "mark": { "type": "text", "fontSize": 11, "baseline": "middle", "clip": true },
+      "encoding": {
+        "y": { "field": "min_c", "type": "quantitative" },
+        "text": { "field": "min_c", "type": "quantitative", "format": ".1f" },
+        "yOffset": { "value": 10 },
+        "color": { "value": "#3b82f6" }
       }
     }
   ],
 
   "config": {
-    "axis": {"grid": true, "gridOpacity": 0.15, "labelColor": "#333", "titleColor": "#333"},
-    "view": {"stroke": null},
+    "axis": {
+      "grid": true,
+      "gridOpacity": 0.08,
+      "tickSize": 3,
+      "labelColor": "#333",
+      "titleColor": "#333"
+    },
+    "legend": { "labelLimit": 220 },
+    "view": { "stroke": null },
     "background": "white"
   }
 }
